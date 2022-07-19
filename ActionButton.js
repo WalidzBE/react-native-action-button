@@ -1,4 +1,4 @@
-import React, { Component, useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   StyleSheet,
@@ -101,13 +101,8 @@ const ActionButton = (props) => {
     };
 
     const wrapperStyle = {
-      backgroundColor: anim.current.interpolate({
-        inputRange: [0, 1],
-        outputRange: [
-          props.buttonColor,
-          props.btnOutRange || props.buttonColor,
-        ],
-      }),
+      //@WalidzBE removed backgroundColor animation
+      backgroundColor: props.buttonColor,
       width: props.size,
       height: props.size,
       borderRadius: props.size / 2,
@@ -133,37 +128,40 @@ const ActionButton = (props) => {
         : { marginHorizontal: props.offsetX, zIndex: props.zIndex };
 
     return (
-      <View
-        style={[
-          parentStyle,
-          !props.hideShadow && shadowStyle,
-          !props.hideShadow && props.shadowStyle,
-        ]}
-      >
-        <Touchable
-          testID={props.testID}
-          accessible={props.accessible}
-          accessibilityLabel={props.accessibilityLabel}
-          background={touchableBackground(
-            props.nativeFeedbackRippleColor,
-            props.fixNativeFeedbackRadius
-          )}
-          activeOpacity={props.activeOpacity}
-          onLongPress={props.onLongPress}
-          onPress={() => {
-            props.onPress();
-            if (props.children) animateButton();
-          }}
-          onPressIn={props.onPressIn}
-          onPressOut={props.onPressOut}
+      //WalidzBE implemented animatedStyle
+      <Animated.View style={props.animatedStyle}>
+        <View
+          style={[
+            parentStyle,
+            !props.hideShadow && shadowStyle,
+            !props.hideShadow && props.shadowStyle,
+          ]}
         >
-          <Animated.View style={wrapperStyle}>
-            <Animated.View style={[buttonStyle, animatedViewStyle]}>
-              {_renderButtonIcon()}
+          <Touchable
+            testID={props.testID}
+            accessible={props.accessible}
+            accessibilityLabel={props.accessibilityLabel}
+            background={touchableBackground(
+              props.nativeFeedbackRippleColor,
+              props.fixNativeFeedbackRadius
+            )}
+            activeOpacity={props.activeOpacity}
+            onLongPress={props.onLongPress}
+            onPress={() => {
+              props.onPress();
+              if (props.children) animateButton();
+            }}
+            onPressIn={props.onPressIn}
+            onPressOut={props.onPressOut}
+          >
+            <Animated.View style={[wrapperStyle]}>
+              <Animated.View style={[buttonStyle, animatedViewStyle]}>
+                {_renderButtonIcon()}
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </Touchable>
-      </View>
+          </Touchable>
+        </View>
+      </Animated.View>
     );
   };
 
@@ -295,7 +293,7 @@ const ActionButton = (props) => {
         style={[
           getOverlayStyles(),
           {
-            backgroundColor: props.bgColor,
+            //backgroundColor: props.bgColor,
             opacity: anim.current.interpolate({
               inputRange: [0, 1],
               outputRange: [0, props.bgOpacity],
@@ -346,6 +344,11 @@ ActionButton.propTypes = {
   bgOpacity: PropTypes.number,
   buttonColor: PropTypes.string,
   buttonTextStyle: Text.propTypes.style,
+  animatedStyle: PropTypes.PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array,
+    PropTypes.number,
+  ]),
   buttonText: PropTypes.string,
 
   offsetX: PropTypes.number,
@@ -400,6 +403,7 @@ ActionButton.defaultProps = {
   testID: undefined,
   accessibilityLabel: undefined,
   accessible: undefined,
+  animatedStyle: undefined,
 };
 
 const styles = StyleSheet.create({
